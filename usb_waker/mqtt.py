@@ -19,6 +19,8 @@ class HomeAssistantMqttService:
     def __init__(self, app, config):
         self.app = app
         self.config = config
+        self.connect_timeout_s = 1.0
+        self.poll_timeout_s = max(0.01, float(self.config.main_loop_delay_s))
 
         self.client = None
         self.ssl_context = None
@@ -38,6 +40,21 @@ class HomeAssistantMqttService:
             "state_usb": "{}/state/usb_connected".format(base_topic),
             "state_wake_count": "{}/state/wake_count".format(base_topic),
         }
+
+    def apply_poll_timeout(self):
+        if self.client is None:
+            return
+
+        try:
+            self.client._socket_timeout = self.poll_timeout_s
+        except Exception:
+            pass
+
+        try:
+            if self.client._sock is not None:
+                self.client._sock.settimeout(self.poll_timeout_s)
+        except Exception:
+            pass
 
     def is_connected(self):
         if self.client is None:
@@ -252,6 +269,7 @@ class HomeAssistantMqttService:
             keep_alive=self.config.mqtt_keep_alive,
             socket_pool=self.app.get_socket_pool(),
             ssl_context=self.get_ssl_context(),
+            socket_timeout=self.connect_timeout_s,
         )
         client.will_set(self.topics["availability"], "offline", retain=True)
         client.add_topic_callback(self.topics["command_wake"], self.on_wake_command)
@@ -269,6 +287,7 @@ class HomeAssistantMqttService:
 
         self.app.log("Connecting to MQTT broker {}...".format(self.config.mqtt_broker))
         self.client.connect()
+        self.apply_poll_timeout()
         self.client.subscribe(self.topics["command_wake"])
         self.client.subscribe(self.config.ha_status_topic)
         self.last_connect = time.monotonic()
@@ -322,7 +341,7 @@ class HomeAssistantMqttService:
             return
 
         try:
-            self.client.loop(timeout=0.01)
+            self.client.loop(timeout=self.poll_timeout_s)
         except Exception as error:
             self.app.record_error("MQTT loop", error)
             self.app.log("MQTT loop error: {}".format(error))

@@ -175,7 +175,7 @@ mosquitto_pub -h <broker> -t usb_host_waker/<device_id>/command/wake -m WAKE
 | `WIFI_MAX_RETRIES` | `10` | 单次 Wi-Fi 连接流程的最大重试次数。 |
 | `WIFI_RETRY_DELAY_S` | `2` | Wi-Fi 重试间隔秒数。 |
 | `WIFI_CHECK_INTERVAL_S` | `5` | 主循环中检查 Wi-Fi 状态的间隔。 |
-| `MAIN_LOOP_DELAY_S` | `0.05` | 主循环每次迭代之间的等待时间。 |
+| `MAIN_LOOP_DELAY_S` | `0.05` | 主循环每次迭代之间的等待时间。同时也作为 MiniMQTT 建连后的轮询超时。 |
 | `SERVICE_RESTART_DELAY_S` | `1` | 运行时异常后重建服务前的等待时间。 |
 
 ### HTTP

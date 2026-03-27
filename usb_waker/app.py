@@ -71,7 +71,7 @@ class UsbHostWakerApp:
             return -1
 
     def record_error(self, context, error):
-        formatted = "{}: {}\n\n{}".format(context, error, traceback.format_exc())
+        formatted = "{}: {}\n\n{}".format(context, error, "\n".join(traceback.format_exception(error)))
         self.last_error_text = truncate_text(formatted, ERROR_TEXT_LIMIT)
         self.pending_status_publish = True
 

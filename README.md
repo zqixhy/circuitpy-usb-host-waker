@@ -175,7 +175,7 @@ All configuration is read from `settings.toml`.
 | `WIFI_MAX_RETRIES` | `10` | Maximum retries per Wi-Fi connect cycle. |
 | `WIFI_RETRY_DELAY_S` | `2` | Delay between Wi-Fi retry attempts. |
 | `WIFI_CHECK_INTERVAL_S` | `5` | Interval between connectivity checks in the main loop. |
-| `MAIN_LOOP_DELAY_S` | `0.05` | Delay between iterations of the main loop. |
+| `MAIN_LOOP_DELAY_S` | `0.05` | Delay between iterations of the main loop. Also reused as the post-connect MiniMQTT polling timeout. |
 | `SERVICE_RESTART_DELAY_S` | `1` | Delay before rebuilding services after a runtime failure. |
 
 ### HTTP
