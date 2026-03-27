@@ -283,4 +283,4 @@ Recommended hardware smoke test after changes:
 
 ## License
 
-This repository does not currently include a `LICENSE` file.
+This project is licensed under the MIT License. See [`LICENSE`](LICENSE).

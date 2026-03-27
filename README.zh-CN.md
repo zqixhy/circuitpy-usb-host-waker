@@ -283,4 +283,4 @@ python3 -m py_compile code.py usb_waker/*.py
 
 ## 许可证
 
-这个仓库目前还没有提供 `LICENSE` 文件。
+本项目采用 MIT License，详见 [`LICENSE`](LICENSE)。
