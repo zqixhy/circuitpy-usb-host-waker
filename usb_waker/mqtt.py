@@ -256,7 +256,8 @@ class HomeAssistantMqttService:
     def build_client(self):
         if MQTT is None:
             raise RuntimeError(
-                "MQTT_BROKER is set but adafruit_minimqtt is missing from /lib"
+                "MQTT_BROKER is set but MQTT libraries are missing from /lib: "
+                "adafruit_minimqtt, adafruit_connection_manager, adafruit_ticks"
             )
 
         client = MQTT.MQTT(

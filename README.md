@@ -20,6 +20,8 @@ Wake a sleeping host from a CircuitPython board by exposing the board as a USB H
 - `adafruit_hid`
 - `adafruit_httpserver`
 - `adafruit_minimqtt`
+- `adafruit_connection_manager`
+- `adafruit_ticks`
 - Home Assistant MQTT Discovery
 
 ## Prerequisites
@@ -31,7 +33,7 @@ Before deploying to a board, make sure you have:
 - A host whose BIOS/UEFI and OS allow USB wake from sleep
 - `adafruit_hid` in the board's `/lib`
 - `adafruit_httpserver` in the board's `/lib`
-- `adafruit_minimqtt` in the board's `/lib` if you want MQTT or Home Assistant integration
+- `adafruit_minimqtt`, `adafruit_connection_manager`, and `adafruit_ticks` in the board's `/lib` if you want MQTT or Home Assistant integration
 
 Notes:
 
@@ -56,7 +58,7 @@ cp settings.toml.example "$CIRCUITPY/settings.toml"
 If you use `circup`, this is the simplest path:
 
 ```bash
-circup install adafruit_hid adafruit_httpserver adafruit_minimqtt
+circup install adafruit_hid adafruit_httpserver adafruit_minimqtt adafruit_connection_manager adafruit_ticks
 ```
 
 If you do not use `circup`, copy these libraries from the Adafruit CircuitPython library bundle into `"$CIRCUITPY/lib"`:
@@ -64,6 +66,8 @@ If you do not use `circup`, copy these libraries from the Adafruit CircuitPython
 - `adafruit_hid`
 - `adafruit_httpserver`
 - `adafruit_minimqtt` when MQTT is enabled
+- `adafruit_connection_manager` when MQTT is enabled
+- `adafruit_ticks` when MQTT is enabled
 
 3. Edit `settings.toml` on the board.
 
@@ -252,7 +256,7 @@ The full example configuration is available in [`settings.toml.example`](setting
 
 - Confirm the MQTT integration is configured in Home Assistant
 - Verify broker address, credentials, port, and TLS settings
-- Confirm `adafruit_minimqtt` is present in `/lib`
+- Confirm `adafruit_minimqtt`, `adafruit_connection_manager`, and `adafruit_ticks` are present in `/lib`
 - Check whether `homeassistant/.../config` discovery topics are reaching the broker
 
 ### HTTP works but the host does not wake
@@ -263,7 +267,7 @@ The full example configuration is available in [`settings.toml.example`](setting
 
 ### MQTT is configured but the app reports a missing library
 
-If you see `MQTT_BROKER is set but adafruit_minimqtt is missing from /lib`, copy `adafruit_minimqtt` to the board's `/lib` directory or remove the MQTT settings.
+If you see `MQTT_BROKER is set but MQTT libraries are missing from /lib`, copy `adafruit_minimqtt`, `adafruit_connection_manager`, and `adafruit_ticks` to the board's `/lib` directory or remove the MQTT settings.
 
 ## Development
 

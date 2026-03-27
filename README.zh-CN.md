@@ -20,6 +20,8 @@
 - `adafruit_hid`
 - `adafruit_httpserver`
 - `adafruit_minimqtt`
+- `adafruit_connection_manager`
+- `adafruit_ticks`
 - Home Assistant MQTT Discovery
 
 ## 前置条件
@@ -31,7 +33,7 @@
 - 目标主机在 BIOS/UEFI 和操作系统层面允许 USB 唤醒
 - 开发板 `/lib` 中包含 `adafruit_hid`
 - 开发板 `/lib` 中包含 `adafruit_httpserver`
-- 如果要启用 MQTT 或 Home Assistant，开发板 `/lib` 中还需要 `adafruit_minimqtt`
+- 如果要启用 MQTT 或 Home Assistant，开发板 `/lib` 中还需要 `adafruit_minimqtt`、`adafruit_connection_manager` 和 `adafruit_ticks`
 
 说明：
 
@@ -56,7 +58,7 @@ cp settings.toml.example "$CIRCUITPY/settings.toml"
 如果你使用 `circup`，最直接的方式是：
 
 ```bash
-circup install adafruit_hid adafruit_httpserver adafruit_minimqtt
+circup install adafruit_hid adafruit_httpserver adafruit_minimqtt adafruit_connection_manager adafruit_ticks
 ```
 
 如果不用 `circup`，请从 Adafruit CircuitPython 库包中把下面这些目录复制到 `"$CIRCUITPY/lib"`：
@@ -64,6 +66,8 @@ circup install adafruit_hid adafruit_httpserver adafruit_minimqtt
 - `adafruit_hid`
 - `adafruit_httpserver`
 - 启用 MQTT 时再额外复制 `adafruit_minimqtt`
+- 启用 MQTT 时再额外复制 `adafruit_connection_manager`
+- 启用 MQTT 时再额外复制 `adafruit_ticks`
 
 3. 编辑开发板上的 `settings.toml`。
 
@@ -252,7 +256,7 @@ mosquitto_pub -h <broker> -t usb_host_waker/<device_id>/command/wake -m WAKE
 
 - 确认 Home Assistant 已正确启用 MQTT integration
 - 检查 broker 地址、账号密码、端口和 TLS 设置
-- 确认 `/lib` 中存在 `adafruit_minimqtt`
+- 确认 `/lib` 中存在 `adafruit_minimqtt`、`adafruit_connection_manager` 和 `adafruit_ticks`
 - 检查 broker 是否已经收到了 `homeassistant/.../config` discovery 主题
 
 ### HTTP 能用，但主机没有被唤醒
@@ -263,7 +267,7 @@ mosquitto_pub -h <broker> -t usb_host_waker/<device_id>/command/wake -m WAKE
 
 ### 配了 MQTT，但程序提示缺少库
 
-如果报错 `MQTT_BROKER is set but adafruit_minimqtt is missing from /lib`，说明你需要把 `adafruit_minimqtt` 复制到开发板的 `/lib`，或者移除 MQTT 相关配置。
+如果报错 `MQTT_BROKER is set but MQTT libraries are missing from /lib`，说明你需要把 `adafruit_minimqtt`、`adafruit_connection_manager` 和 `adafruit_ticks` 复制到开发板的 `/lib`，或者移除 MQTT 相关配置。
 
 ## 开发
 

@@ -44,3 +44,5 @@ MQTT_STATUS_PUBLISH_INTERVAL_S="30"
 # - adafruit_hid
 # - adafruit_httpserver
 # - adafruit_minimqtt
+# - adafruit_connection_manager
+# - adafruit_ticks
