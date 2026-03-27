@@ -104,23 +104,19 @@ HA_DEVICE_NAME="USB Host Waker"
 http://<board-ip>/
 ```
 
-页面里会显示唤醒按钮和实时状态表。
+页面里会显示唤醒按钮和状态表。
 
 可用接口如下：
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
 | `GET` | `/` | 主控制页和状态页 |
-| `GET` | `/status` | 同样的 HTML 状态页 |
-| `GET` | `/status.json` | JSON 状态数据 |
 | `GET` | `/healthz` | 纯文本 `ok` |
-| `GET` | `/wake_up` | 唤醒表单页面 |
-| `POST` | `/wake_up` | 触发一次 USB HID 唤醒报告 |
+| `POST` | `/wake_up` | 触发一次 USB HID 唤醒报告，页面不跳转 |
 
 示例：
 
 ```bash
-curl http://<board-ip>/status.json
 curl -X POST http://<board-ip>/wake_up
 ```
 
@@ -164,7 +160,7 @@ mosquitto_pub -h <broker> -t usb_host_waker/<device_id>/command/wake -m WAKE
 - `binary_sensor`：`USB Connected`
 - `sensor`：`Wake Count`
 
-`/status.json` 还会包含 `ip`、`http_url`、`uptime_seconds`、`last_wake_source`、`last_error_text`、`reset_reason` 等字段。
+MQTT 的 JSON 状态消息还会包含 `ip`、`http_url`、`uptime_seconds`、`last_wake_source`、`last_error_text`、`reset_reason` 等字段。
 
 ## 配置说明
 
@@ -280,7 +276,7 @@ python3 -m py_compile code.py usb_waker/*.py
 修改后的硬件冒烟验证建议：
 
 - 确认开发板重启后能重新连上 Wi-Fi
-- 打开 `/` 和 `/status.json`
+- 打开 `/`
 - 触发 `POST /wake_up`
 - 启用 MQTT 时确认 broker 连接成功
 - 确认 Home Assistant 实体出现并能更新

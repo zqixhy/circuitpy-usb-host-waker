@@ -1,5 +1,3 @@
-import gc
-import json
 import time
 
 from adafruit_httpserver import GET, POST, Request, Response, Server
@@ -66,10 +64,65 @@ class HttpServerService:
         return """
 <h2>Wake Up Host</h2>
 <p>Trigger a wake report over USB HID.</p>
-<form method="POST" action="/wake_up">
-    <button type="submit">Wake Up</button>
+<form id="wake-form" method="POST" action="/wake_up">
+    <button id="wake-button" type="submit">Wake Up</button>
 </form>
-<p><a href="/status.json">JSON status</a></p>
+"""
+
+    def render_client_script_html(self):
+        return """
+<script>
+(function () {
+    var form = document.getElementById("wake-form");
+    var button = document.getElementById("wake-button");
+    var notice = document.getElementById("notice");
+    var statusPanel = document.getElementById("status-panel");
+
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
+
+    function finishRequest() {
+        button.disabled = false;
+        button.textContent = "Wake Up";
+    }
+
+    if (!form || !button || !notice || !statusPanel || !window.fetch || !window.DOMParser) {
+        return;
+    }
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        button.disabled = true;
+        button.textContent = "Sending...";
+        notice.innerHTML = "<p>Sending wake request...</p>";
+
+        fetch(form.action, { method: "POST" })
+            .then(function (response) {
+                return response.text();
+            })
+            .then(function (html) {
+                var doc = new DOMParser().parseFromString(html, "text/html");
+                var nextNotice = doc.getElementById("notice");
+                var nextStatus = doc.getElementById("status-panel");
+
+                if (nextNotice) {
+                    notice.innerHTML = nextNotice.innerHTML;
+                }
+                if (nextStatus) {
+                    statusPanel.innerHTML = nextStatus.innerHTML;
+                }
+            })
+            .catch(function (error) {
+                notice.innerHTML = "<h2>Error</h2><pre>" + escapeHtml(error) + "</pre>";
+            })
+            .then(finishRequest);
+    });
+})();
+</script>
 """
 
     def html_page(self, title, body_html):
@@ -86,10 +139,15 @@ class HttpServerService:
 </html>
 """.format(title, title, body_html)
 
-    def render_home_page_html(self):
+    def render_home_page_html(self, notice_html=""):
         return self.html_page(
             self.config.device_name,
-            self.render_wake_form_html() + self.render_status_table_html(),
+            "<div id='notice'>{}</div><div id='controls'>{}</div><div id='status-panel'>{}</div>{}".format(
+                notice_html,
+                self.render_wake_form_html(),
+                self.render_status_table_html(),
+                self.render_client_script_html(),
+            ),
         )
 
     def start(self):
@@ -107,37 +165,9 @@ class HttpServerService:
                 content_type="text/html",
             )
 
-        @http_server.route("/status", GET)
-        def status_page(request: Request):
-            return Response(
-                request,
-                self.render_home_page_html(),
-                content_type="text/html",
-            )
-
-        @http_server.route("/status.json", GET)
-        def status_json(request: Request):
-            gc.collect()
-            return Response(
-                request,
-                json.dumps(self.app.get_status_dict(), separators=(",", ":")),
-                content_type="application/json",
-            )
-
         @http_server.route("/healthz", GET)
         def healthz(request: Request):
             return Response(request, "ok", content_type="text/plain")
-
-        @http_server.route("/wake_up", GET)
-        def wake_up_page(request: Request):
-            return Response(
-                request,
-                self.html_page(
-                    self.config.device_name,
-                    self.render_wake_form_html() + self.render_status_table_html(),
-                ),
-                content_type="text/html",
-            )
 
         @http_server.route("/wake_up", POST)
         def wake_up(request: Request):
@@ -145,9 +175,8 @@ class HttpServerService:
                 self.app.wake_host("http")
                 return Response(
                     request,
-                    self.html_page(
-                        self.config.device_name,
-                        "<h2>Wake request sent.</h2><p><a href='/'>Back</a></p>",
+                    self.render_home_page_html(
+                        "<h2>Wake request sent.</h2>"
                     ),
                     content_type="text/html",
                 )
@@ -155,9 +184,8 @@ class HttpServerService:
                 self.app.record_error("Wake request", error)
                 return Response(
                     request,
-                    self.html_page(
-                        self.config.device_name,
-                        "<h2>Error</h2><pre>{}</pre><p><a href='/'>Back</a></p>".format(
+                    self.render_home_page_html(
+                        "<h2>Error</h2><pre>{}</pre>".format(
                             html_escape(self.app.last_error_text)
                         ),
                     ),

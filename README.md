@@ -104,23 +104,19 @@ After the board joins Wi-Fi, open the reported URL in a browser:
 http://<board-ip>/
 ```
 
-The page includes a wake button and a live status table.
+The page includes a wake button and a status table.
 
 Useful endpoints:
 
 | Method | Path | Description |
 | --- | --- | --- |
 | `GET` | `/` | Main control and status page |
-| `GET` | `/status` | Same HTML status page |
-| `GET` | `/status.json` | JSON status payload |
 | `GET` | `/healthz` | Plain-text `ok` |
-| `GET` | `/wake_up` | Wake form page |
-| `POST` | `/wake_up` | Trigger one USB HID wake report |
+| `POST` | `/wake_up` | Trigger one USB HID wake report without leaving the page |
 
 Example API calls:
 
 ```bash
-curl http://<board-ip>/status.json
 curl -X POST http://<board-ip>/wake_up
 ```
 
@@ -164,7 +160,7 @@ The MQTT discovery payload creates these entities:
 - `binary_sensor`: `USB Connected`
 - `sensor`: `Wake Count`
 
-The JSON status payload also includes fields such as `ip`, `http_url`, `uptime_seconds`, `last_wake_source`, `last_error_text`, and `reset_reason`.
+The MQTT JSON status payload also includes fields such as `ip`, `http_url`, `uptime_seconds`, `last_wake_source`, `last_error_text`, and `reset_reason`.
 
 ## Configuration
 
@@ -280,7 +276,7 @@ python3 -m py_compile code.py usb_waker/*.py
 Recommended hardware smoke test after changes:
 
 - Confirm the board reconnects to Wi-Fi after reset
-- Open `/` and `/status.json`
+- Open `/`
 - Trigger `POST /wake_up`
 - Verify MQTT connects when enabled
 - Confirm Home Assistant entities appear and update
