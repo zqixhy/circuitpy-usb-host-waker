@@ -42,8 +42,9 @@ def sanitize_id(value, fallback):
 
     result = []
     for char in str(value):
-        if char.isalnum() or char in "_-":
-            result.append(char.lower())
+        lower_char = char.lower()
+        if ("a" <= lower_char <= "z") or ("0" <= char <= "9") or char in "_-":
+            result.append(lower_char)
         else:
             result.append("_")
 
